@@ -1,4 +1,4 @@
-# Emerging Threats Rules
+# NT Emerging Threats Rules
 
 This folder contains rules that belongs to the "emerging-threats" category of SIGMA. This category aims to cover specific threats that are timely and relevant for certain periods of time. These threats include specific APT campaigns, exploitation of Zero-Day vulnerabilities, specific malware used during an attack,...etc.
 
