@@ -1,4 +1,4 @@
-title: TA505 Dropper Load Pattern
+title: NT-TA505 Dropper Load Pattern
 id: 18cf6cf0-39b0-4c22-9593-e244bdc9a2d4
 status: deprecated
 description: Detects mshta loaded by wmiprvse as parent as used by TA505 malicious documents
