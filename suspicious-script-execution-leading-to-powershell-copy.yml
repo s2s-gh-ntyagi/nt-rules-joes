@@ -1,0 +1,38 @@
+title: Suspicious Script Execution Leading to PowerShell
+id: 3f14e36e-3fae-4211-b0c4-d65136b54e6c
+status: experimental
+description: >-
+  Detects the execution of a JavaScript or Windows Script File via wscript.exe
+  or cscript.exe that subsequently spawns a PowerShell process. This behavior is
+  indicative of the initial stage of the DarkCloud Stealer infection chain,
+  where a malicious script is used to download and execute the next stage
+  payload.
+references:
+  - https://unit42.paloaltonetworks.com/new-darkcloud-stealer-infection-chain/
+author: detections.ai
+date: 2025-09-10T00:00:00.000Z
+tags:
+  - attack.t1059.007
+  - attack.t1059.001
+  - attack.t1204.002
+logsource:
+  category: process_creation
+  product: windows
+  service: security
+detection:
+  selection:
+    ParentImage|endswith:
+      - \wscript.exe
+      - \cscript.exe
+    ParentCommandLine|contains:
+      - .js
+      - .wsf
+    Image|endswith:
+      - \powershell.exe
+      - \pwsh.exe
+  condition: selection
+falsepositives:
+  - Legitimate administrative scripts (JS/WSF) may call PowerShell as part of
+    their normal operation. Tuning may be required based on environment-specific
+    tools and scripts.
+level: medium
