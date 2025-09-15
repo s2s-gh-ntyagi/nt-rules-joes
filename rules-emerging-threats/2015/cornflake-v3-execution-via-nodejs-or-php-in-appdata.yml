@@ -1,0 +1,49 @@
+title: CORNFLAKE V3 Execution via Node.js or PHP in AppData
+id: 618daea8-2dcf-46b0-b40f-27b370753c88
+status: experimental
+description: >-
+  Detects PowerShell launching `node.exe` or `php.exe` from a user's AppData
+  directory with specific arguments. This behavior is a strong indicator of the
+  CORNFLAKE.V3 backdoor, which utilizes these interpreters to execute malicious
+  scripts as part of its infection chain.
+references:
+  - https://cloud.google.com/blog/topics/threat-intelligence/analyzing-cornflake-v3-backdoor
+author: detections.ai
+date: 2025-09-14
+tags:
+  - attack.execution
+  - attack.t1059.001
+  - attack.t1059.006
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  # Parent process is powershell.exe
+  parent_process:
+    ParentImage|endswith: '\powershell.exe'
+  # Detects the Node.js variant execution
+  selection_node:
+    Image|endswith: '\node.exe'
+    Image|contains:
+      - '\AppData\Roaming\'
+      - '\AppData\Local\'
+    CommandLine|contains: ' -e ' # Argument to execute script directly from the command line
+  # Detects the PHP variant execution
+  selection_php:
+    Image|endswith: '\php.exe'
+    Image|contains:
+      - '\AppData\Roaming\'
+      - '\AppData\Local\'
+    CommandLine|contains: ' -d ' # Argument to define an INI entry
+    CommandLine|endswith: ' 1' # Specific argument seen in the attack
+  # Filter out legitimate PHP script execution by file extension
+  filter_php_legit:
+    CommandLine|contains: '.php'
+  condition: parent_process and (selection_node or (selection_php and not
+    filter_php_legit))
+falsepositives:
+  - Legitimate but unusual use of Node.js or PHP by developers or certain
+    applications might trigger this rule. The combination of PowerShell as a
+    parent, execution from AppData, and specific command-line arguments
+    significantly reduces the likelihood of false positives.
+level: high
